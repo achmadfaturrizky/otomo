@@ -11,16 +11,47 @@ import {
   ToastAndroid,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import firebase from 'firebase';
+import fire from '../../config/firebase';
 
 import fonts from '../../config/fonts';
 
 const desc =
   'one-month subscription for Rp. 100,000, for you who want to be more efficient';
 
+const driver = [
+  {
+    id: 1,
+    name: 'Mustopa',
+    motorcycle: 'Vario',
+    plateNumber: 'H 2020 PA',
+  },
+  {
+    id: 2,
+    name: 'Achmad',
+    motorcycle: 'Ducati',
+    plateNumber: 'H 2021 PA',
+  },
+  {
+    id: 3,
+    name: 'Tiger',
+    motorcycle: 'Ninja 600cc',
+    plateNumber: 'H 2022 PA',
+  },
+];
+
 class Detail extends Component {
   constructor(props) {
     super(props);
     this.item = props.navigation.getParam('item');
+    this.state = {
+      modalVisible: false,
+      name: '',
+      location: '',
+      price: '',
+      time1: '',
+      time2: '',
+    };
   }
 
   format = money => {
@@ -36,6 +67,84 @@ class Detail extends Component {
       .reverse()
       .join('');
     return thousand;
+  };
+
+  setModalVisible(visible) {
+    this.setState({modalVisible: visible});
+  }
+  setModalDetailVisible(modalVisibleDetail) {
+    this.setState({modalVisibleDetail});
+  }
+
+  subscribe = async () => {
+    // const uid =  Math.floor(Math.random() * 10000000000000) + 1
+    const {duration, name, price} = this.item;
+    const {time1, time2, location} = this.state;
+    const randomDriver = driver[Math.floor(Math.random() * driver.length)];
+    const ref = firebase.database().ref('/transaction');
+    const fixDuration = duration * 22;
+    let data = [];
+    let tmp = {};
+    let j = 1;
+    for (let i = 0; i < fixDuration; i++) {
+      tmp = {
+        _id: Math.floor(Math.random() * 10000000000000) + 1,
+        name,
+        duration,
+        location,
+        price,
+        driver: randomDriver,
+        createdAt: firebase.database.ServerValue.TIMESTAMP,
+        date: new Date().getDate() + i,
+        time1,
+      };
+
+      data.push(tmp);
+      j++;
+
+      tmp = {
+        _id: Math.floor(Math.random() * 10000000000000) + 1,
+        name,
+        duration,
+        location,
+        price,
+        driver: randomDriver,
+        createdAt: firebase.database.ServerValue.TIMESTAMP,
+        date: new Date().getDate() + i,
+        time2,
+      };
+      data.push(tmp);
+      j++;
+    }
+    if (location === '') {
+      return ToastAndroid.showWithGravity(
+        'Location must be filled!',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+    } else if (time1 === '') {
+      return ToastAndroid.showWithGravity(
+        'First Time must be filled!',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+    } else if (time2 === '') {
+      return ToastAndroid.showWithGravity(
+        'Second Time must be filled!',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+    }
+    this.setState({location: '', time1: '', time2: ''});
+    ToastAndroid.showWithGravity(
+      'Task successfully added',
+      ToastAndroid.SHORT,
+      ToastAndroid.CENTER,
+    );
+    await ref.push({
+      data,
+    });
+    this.setModalVisible(!this.state.modalVisible);
   };
 
   render() {
@@ -71,11 +180,85 @@ class Detail extends Component {
               style={styles.buttonContainer}
               start={{x: 0, y: 0}}
               end={{x: 1, y: 0}}>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  this.setModalVisible(true);
+                }}>
                 <Text style={styles.buttonText}>Subscribe</Text>
               </TouchableOpacity>
             </LinearGradient>
           </View>
+          <Modal
+            visible={this.state.modalVisible}
+            backdropColor="transparent"
+            transparent={true}
+            style={styles.modalWindow}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <View style={styles.containerInput}>
+                  <Text style={styles.modalTitle}>Details</Text>
+                  <View style={styles.contentInput}>
+                    <TextInput
+                      onChangeText={value =>
+                        this.setState({
+                          name,
+                        })
+                      }
+                      editable={false}
+                      placeholder={name}
+                      style={styles.textInput}
+                    />
+                    <TextInput
+                      onChangeText={value =>
+                        this.setState({
+                          location: value,
+                        })
+                      }
+                      multiline={true}
+                      numberOfLines={8}
+                      placeholder="Location"
+                      style={styles.inputDesc}
+                    />
+                    <TextInput
+                      onChangeText={value =>
+                        this.setState({
+                          time1: value,
+                        })
+                      }
+                      placeholder="First Time"
+                      style={styles.textInput}
+                    />
+                    <TextInput
+                      onChangeText={value =>
+                        this.setState({
+                          time2: value,
+                        })
+                      }
+                      placeholder="Second Time"
+                      style={styles.textInput}
+                    />
+                    <Text style={styles.textTotal}>
+                      Total: Rp. {this.format(price)}
+                    </Text>
+                  </View>
+                  <View style={styles.containerButton}>
+                    <TouchableOpacity
+                      onPress={this.subscribe}
+                      style={styles.buttonAdd}>
+                      <Text style={styles.textButtonAdd}>Subscribe</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.buttonCancel}
+                      onPress={() => {
+                        this.setModalVisible(!this.state.modalVisible);
+                      }}>
+                      <Text style={styles.textButtonCancel}>Cancel</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </Modal>
         </View>
       </>
     );
@@ -160,5 +343,82 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     color: '#fff',
     fontSize: 15,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalTitle: {
+    fontFamily: fonts.medium,
+    fontSize: 18,
+    marginLeft: 20,
+  },
+  containerInput: {
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  contentInput: {
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  textInput: {
+    marginBottom: 15,
+    borderRadius: 5,
+    width: '90%',
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#C8CEC4',
+  },
+  inputDesc: {
+    marginBottom: 15,
+    borderRadius: 5,
+    width: '90%',
+    height: 60,
+    borderWidth: 1,
+    borderColor: '#C8CEC4',
+  },
+  containerButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    marginTop: 20,
+  },
+  buttonAdd: {
+    backgroundColor: '#7be495',
+    width: '40%',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textButtonAdd: {
+    color: '#fff',
+    fontFamily: fonts.medium,
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  buttonCancel: {
+    borderColor: '#7be495',
+    borderWidth: 1,
+    backgroundColor: '#fff',
+    width: '40%',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textButtonCancel: {
+    color: '#7be495',
+    fontFamily: fonts.medium,
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    width: '90%',
+    borderRadius: 10,
+    justifyContent: 'center',
+  },
+  textTotal: {
+    fontFamily: fonts.medium,
   },
 });

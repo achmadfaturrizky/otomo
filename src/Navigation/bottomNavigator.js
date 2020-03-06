@@ -3,6 +3,7 @@ import {Image, Text} from 'react-native';
 import {createBottomTabNavigator} from 'react-navigation-tabs';
 
 import Home from '../Screens/Home';
+import Transaction from '../Screens/Transaction';
 
 export const BottomNavigator = createBottomTabNavigator(
   {
@@ -29,8 +30,8 @@ export const BottomNavigator = createBottomTabNavigator(
         ),
       },
     },
-    News: {
-      screen: Home,
+    Transaction: {
+      screen: Transaction,
       navigationOptions: {
         tabBarLabel: ({tintColor}) => (
           <Text
@@ -40,7 +41,7 @@ export const BottomNavigator = createBottomTabNavigator(
               color: tintColor,
               bottom: 2,
             }}>
-            News
+            Transaction
           </Text>
         ),
         tabBarIcon: ({tintColor}) => (

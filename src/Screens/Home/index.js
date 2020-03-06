@@ -53,6 +53,7 @@ class Home extends Component {
 
   render() {
     const {subscribe} = this.state;
+    console.log(subscribe);
     return (
       <View style={styles.container}>
         <Text style={styles.titleContainer}>Subscription</Text>
