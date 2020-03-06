@@ -56,7 +56,7 @@ class Home extends Component {
     console.log(subscribe);
     return (
       <View style={styles.container}>
-        <Text style={styles.titleContainer}>Subscription</Text>
+        <Text style={styles.titleContainer}>Subscriptions</Text>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.cardContainer}>
             {subscribe.map(item => (

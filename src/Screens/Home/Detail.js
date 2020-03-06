@@ -47,7 +47,8 @@ class Detail extends Component {
     this.state = {
       modalVisible: false,
       name: '',
-      location: '',
+      pickupPoint: '',
+      destination: '',
       price: '',
       time1: '',
       time2: '',
@@ -79,7 +80,7 @@ class Detail extends Component {
   subscribe = async () => {
     // const uid =  Math.floor(Math.random() * 10000000000000) + 1
     const {duration, name, price} = this.item;
-    const {time1, time2, location} = this.state;
+    const {time1, time2, pickupPoint, destination} = this.state;
     const randomDriver = driver[Math.floor(Math.random() * driver.length)];
     const ref = firebase.database().ref('/transaction');
     const fixDuration = duration * 22;
@@ -91,12 +92,13 @@ class Detail extends Component {
         _id: Math.floor(Math.random() * 10000000000000) + 1,
         name,
         duration,
-        location,
+        pickupPoint,
+        destination,
         price,
         driver: randomDriver,
         createdAt: firebase.database.ServerValue.TIMESTAMP,
         date: new Date().getDate() + i,
-        time1,
+        time: time1,
       };
 
       data.push(tmp);
@@ -106,19 +108,26 @@ class Detail extends Component {
         _id: Math.floor(Math.random() * 10000000000000) + 1,
         name,
         duration,
-        location,
+        pickupPoint,
+        destination,
         price,
         driver: randomDriver,
         createdAt: firebase.database.ServerValue.TIMESTAMP,
         date: new Date().getDate() + i,
-        time2,
+        time: time2,
       };
       data.push(tmp);
       j++;
     }
-    if (location === '') {
+    if (pickupPoint === '') {
       return ToastAndroid.showWithGravity(
-        'Location must be filled!',
+        'Pickup Point must be filled!',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+    } else if (destination === '') {
+      return ToastAndroid.showWithGravity(
+        'Destination must be filled!',
         ToastAndroid.SHORT,
         ToastAndroid.CENTER,
       );
@@ -211,12 +220,23 @@ class Detail extends Component {
                     <TextInput
                       onChangeText={value =>
                         this.setState({
-                          location: value,
+                          pickupPoint: value,
                         })
                       }
                       multiline={true}
                       numberOfLines={8}
-                      placeholder="Location"
+                      placeholder="Pickup Point"
+                      style={styles.inputDesc}
+                    />
+                    <TextInput
+                      onChangeText={value =>
+                        this.setState({
+                          destination: value,
+                        })
+                      }
+                      multiline={true}
+                      numberOfLines={8}
+                      placeholder="Destination"
                       style={styles.inputDesc}
                     />
                     <TextInput
