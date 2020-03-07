@@ -10,6 +10,7 @@ import {
 
 import firebase from 'firebase';
 import LinearGradient from 'react-native-linear-gradient';
+import {Placeholder} from '../../components/placeHolder';
 
 import fire from '../../config/firebase';
 import fonts from '../../config/fonts';
@@ -19,7 +20,7 @@ class Transaction extends Component {
     super();
     this.state = {
       transaction: [],
-      ff: [],
+      loading: false,
     };
   }
 
@@ -27,25 +28,10 @@ class Transaction extends Component {
     this.getTransaction();
   };
 
-  //   getTransaction = async () => {
-  //     const ref = firebase.database().ref('/transaction');
-  //     ref.on('value', snapshot => {
-  //       let data = snapshot.val();
-  //       let transaction = Object.values(data);
-  //       let fix = transaction.map(item => item.data);
-  //       let transactionFix = Object.values(fix);
-  //       console.log('ss', transactionFix);
-
-  //       this.setState({
-  //         transaction: transactionFix[1],
-  //         ff: Object.values(transactionFix),
-  //       });
-  //     });
-  //   };
-
-  getTransaction = callback => {
+  getTransaction = async () => {
+    this.setState({loading: true});
     let pathName = '/transaction/';
-    firebase
+    await firebase
       .database()
       .ref(pathName)
       .on('value', snapshot => {
@@ -100,6 +86,7 @@ class Transaction extends Component {
         }
         this.setState({
           transaction: arrayOfTransaction,
+          loading: false,
         });
       });
   };
@@ -120,53 +107,55 @@ class Transaction extends Component {
   };
 
   render() {
-    const {transaction} = this.state;
-    console.log(transaction.map(i => i.name));
-
+    const {transaction, loading} = this.state;
     return (
       <View style={styles.container}>
         <Text style={styles.titleContainer}>Transactions</Text>
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.cardContainer}>
-            {transaction.length < 1 ? (
-              <View>
-                <Text>dddd</Text>
-              </View>
-            ) : (
-              transaction.map(item => (
-                <LinearGradient
-                  colors={['#7be495', '#93f9b9']}
-                  style={styles.card}
-                  start={{x: 0, y: 0}}
-                  end={{x: 1, y: 0}}
-                  key={item._id}>
-                  <TouchableOpacity
-                    style={styles.cardContent}
-                    onPress={() =>
-                      this.props.navigation.navigate('DetailTransaction', {
-                        item,
-                      })
-                    }>
-                    <View style={styles.content}>
-                      <Text style={styles.titleContent}>{item.name}</Text>
-                      <Text style={styles.textOrderId}>#id-{item._id}</Text>
-                      <Text style={styles.textOrderId}>
-                        {new Date(item.createdAt).toString().slice(0, 25)}
-                      </Text>
-                      <Text style={styles.priceContent}>
-                        Rp.{this.format(item.price)}
-                      </Text>
-                    </View>
-                    <Image
-                      style={styles.imageCard}
-                      resizeMode="stretch"
-                      source={require('../../assets/subs.png')}
-                    />
-                  </TouchableOpacity>
-                </LinearGradient>
-              ))
-            )}
-          </View>
+          {loading === true ? (
+            <Placeholder />
+          ) : (
+            <View style={styles.cardContainer}>
+              {transaction.length < 1 ? (
+                <View>
+                  <Text>dddd</Text>
+                </View>
+              ) : (
+                transaction.map(item => (
+                  <LinearGradient
+                    colors={['#7be495', '#93f9b9']}
+                    style={styles.card}
+                    start={{x: 0, y: 0}}
+                    end={{x: 1, y: 0}}
+                    key={item._id}>
+                    <TouchableOpacity
+                      style={styles.cardContent}
+                      onPress={() =>
+                        this.props.navigation.navigate('DetailTransaction', {
+                          item,
+                        })
+                      }>
+                      <View style={styles.content}>
+                        <Text style={styles.titleContent}>{item.name}</Text>
+                        <Text style={styles.textOrderId}>#ID-{item._id}</Text>
+                        <Text style={styles.textOrderId}>
+                          {new Date(item.createdAt).toString().slice(0, 25)}
+                        </Text>
+                        <Text style={styles.priceContent}>
+                          Rp.{this.format(item.price)}
+                        </Text>
+                      </View>
+                      <Image
+                        style={styles.imageCard}
+                        resizeMode="stretch"
+                        source={require('../../assets/subs.png')}
+                      />
+                    </TouchableOpacity>
+                  </LinearGradient>
+                ))
+              )}
+            </View>
+          )}
         </ScrollView>
       </View>
     );

@@ -10,14 +10,17 @@ import {
 import firebase from 'firebase';
 import LinearGradient from 'react-native-linear-gradient';
 
+import {Placeholder} from '../../components/placeHolder';
 import fire from '../../config/firebase';
 import fonts from '../../config/fonts';
+import timer from '../../config/timer';
 
 class Home extends Component {
   constructor() {
     super();
     this.state = {
       subscribe: [],
+      loading: false,
     };
   }
 
@@ -26,12 +29,14 @@ class Home extends Component {
   };
 
   getSubscribe = async () => {
+    this.setState({loading: true});
     const ref = firebase.database().ref('/subscribe');
     ref.on('value', snapshot => {
       let data = snapshot.val();
       let subscribe = Object.values(data);
       this.setState({
         subscribe,
+        loading: false,
       });
     });
   };
@@ -52,40 +57,55 @@ class Home extends Component {
   };
 
   render() {
-    const {subscribe} = this.state;
-    console.log(subscribe);
+    const {subscribe, loading} = this.state;
     return (
       <View style={styles.container}>
-        <Text style={styles.titleContainer}>Subscriptions</Text>
+        <Text style={styles.titleContainer}>
+          Subscriptions<Text style={styles.dot}>.</Text>
+        </Text>
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.cardContainer}>
-            {subscribe.map(item => (
-              <LinearGradient
-                colors={['#7be495', '#93f9b9']}
-                style={styles.card}
-                start={{x: 0, y: 0}}
-                end={{x: 1, y: 0}}
-                key={item._id}>
-                <TouchableOpacity
-                  style={styles.cardContent}
-                  onPress={() =>
-                    this.props.navigation.navigate('Detail', {item})
-                  }>
-                  <View style={styles.content}>
-                    <Text style={styles.titleContent}>{item.name}</Text>
-                    <Text style={styles.priceContent}>
-                      Rp.{this.format(item.price)}
-                    </Text>
-                  </View>
+          {loading === true ? (
+            <Placeholder />
+          ) : (
+            <View style={styles.cardContainer}>
+              {subscribe.length < 1 ? (
+                <View style={styles.contentEmpty}>
                   <Image
-                    style={styles.imageCard}
-                    resizeMode="stretch"
-                    source={require('../../assets/subs.png')}
+                    style={styles.imageEmpty}
+                    source={require('../../assets/empty.png')}
                   />
-                </TouchableOpacity>
-              </LinearGradient>
-            ))}
-          </View>
+                  <Text style={styles.textEmpty}>No Data</Text>
+                </View>
+              ) : (
+                subscribe.map(item => (
+                  <LinearGradient
+                    colors={['#7be495', '#93f9b9']}
+                    style={styles.card}
+                    start={{x: 0, y: 0}}
+                    end={{x: 1, y: 0}}
+                    key={item._id}>
+                    <TouchableOpacity
+                      style={styles.cardContent}
+                      onPress={() =>
+                        this.props.navigation.navigate('Detail', {item})
+                      }>
+                      <View style={styles.content}>
+                        <Text style={styles.titleContent}>{item.name}</Text>
+                        <Text style={styles.priceContent}>
+                          Rp.{this.format(item.price)}
+                        </Text>
+                      </View>
+                      <Image
+                        style={styles.imageCard}
+                        resizeMode="stretch"
+                        source={require('../../assets/subs.png')}
+                      />
+                    </TouchableOpacity>
+                  </LinearGradient>
+                ))
+              )}
+            </View>
+          )}
         </ScrollView>
       </View>
     );
@@ -150,5 +170,20 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#fff',
     marginTop: 5,
+  },
+  imageEmpty: {
+    width: 300,
+    height: 300,
+  },
+  contentEmpty: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textEmpty: {
+    fontFamily: fonts.medium,
+    fontSize: 17,
+  },
+  dot: {
+    color: '#7be495',
   },
 });
