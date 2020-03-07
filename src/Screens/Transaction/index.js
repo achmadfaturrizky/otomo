@@ -11,6 +11,7 @@ import {
 import firebase from 'firebase';
 import LinearGradient from 'react-native-linear-gradient';
 import {Placeholder} from '../../components/placeHolder';
+import {Empty} from '../../components/empty';
 
 import fire from '../../config/firebase';
 import fonts from '../../config/fonts';
@@ -117,9 +118,10 @@ class Transaction extends Component {
           ) : (
             <View style={styles.cardContainer}>
               {transaction.length < 1 ? (
-                <View>
-                  <Text>dddd</Text>
-                </View>
+                <Empty
+                  title="No Transaction"
+                  image={require('../../assets/transaction.png')}
+                />
               ) : (
                 transaction.map(item => (
                   <LinearGradient

@@ -11,6 +11,7 @@ import firebase from 'firebase';
 import LinearGradient from 'react-native-linear-gradient';
 
 import {Placeholder} from '../../components/placeHolder';
+import {Empty} from '../../components/empty';
 import fire from '../../config/firebase';
 import fonts from '../../config/fonts';
 import timer from '../../config/timer';
@@ -69,13 +70,10 @@ class Home extends Component {
           ) : (
             <View style={styles.cardContainer}>
               {subscribe.length < 1 ? (
-                <View style={styles.contentEmpty}>
-                  <Image
-                    style={styles.imageEmpty}
-                    source={require('../../assets/empty.png')}
-                  />
-                  <Text style={styles.textEmpty}>No Data</Text>
-                </View>
+                <Empty
+                  title="No Data"
+                  image={require('../../assets/empty.png')}
+                />
               ) : (
                 subscribe.map(item => (
                   <LinearGradient
