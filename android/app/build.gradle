@@ -126,6 +126,14 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    signingConfigs {
+    release {
+      storeFile file('your_key_name.keystore')
+      storePassword '123456'
+      keyAlias 'your_key_alias'
+      keyPassword '123456'
+    }
+  }
 
     defaultConfig {
         applicationId "com.otomo"
@@ -153,10 +161,12 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+             signingConfig signingConfigs.release
         }
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://facebook.github.io/react-native/docs/signed-apk-android.
+             signingConfig signingConfigs.release
             signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
