@@ -4,6 +4,7 @@ import {createBottomTabNavigator} from 'react-navigation-tabs';
 
 import Home from '../Screens/Home';
 import Transaction from '../Screens/Transaction';
+import Profile from '../Screens/Profile';
 
 export const BottomNavigator = createBottomTabNavigator(
   {
@@ -53,8 +54,8 @@ export const BottomNavigator = createBottomTabNavigator(
         ),
       },
     },
-    Place: {
-      screen: Home,
+    Profile: {
+      screen: Profile,
       navigationOptions: {
         tabBarLabel: ({tintColor}) => (
           <Text
@@ -64,12 +65,12 @@ export const BottomNavigator = createBottomTabNavigator(
               color: tintColor,
               bottom: 2,
             }}>
-            Place
+            Profile
           </Text>
         ),
         tabBarIcon: ({tintColor}) => (
           <Image
-            source={require('../assets/icon/place.png')}
+            source={require('../assets/icon/profile.png')}
             resizeMode="stretch"
             style={{height: 25, width: 25, tintColor: tintColor}}
           />

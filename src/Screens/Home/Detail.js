@@ -12,8 +12,8 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import firebase from 'firebase';
-import fire from '../../config/firebase';
 
+import fire from '../../config/firebase';
 import fonts from '../../config/fonts';
 
 const desc =

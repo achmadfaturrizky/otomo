@@ -7,7 +7,7 @@ export const Empty = props => {
   const {image, title} = props;
   return (
     <View style={styles.contentEmpty}>
-      <Image style={styles.imageEmpty} source={image} />
+      <Image style={styles.imageEmpty} resizeMode="stretch" source={image} />
       <Text style={styles.textEmpty}>{title}</Text>
     </View>
   );
@@ -16,7 +16,7 @@ export const Empty = props => {
 const styles = StyleSheet.create({
   imageEmpty: {
     width: 300,
-    height: 300,
+    height: 200,
   },
   contentEmpty: {
     justifyContent: 'center',
