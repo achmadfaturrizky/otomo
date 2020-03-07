@@ -17,11 +17,13 @@ class DetailTransaction extends Component {
       driver,
       destination,
       pickupPoint,
+      time,
     } = this.item;
     const format =
       new Date(createdAt).toString().slice(4, 8) +
       date +
-      new Date(createdAt).toString().slice(10, 25);
+      new Date(createdAt).toString().slice(10, 16) +
+      time;
     return (
       <View style={styles.container}>
         <Text style={styles.date}>{format}</Text>

@@ -19,6 +19,7 @@ class Transaction extends Component {
     super();
     this.state = {
       transaction: [],
+      ff: [],
     };
   }
 
@@ -26,17 +27,81 @@ class Transaction extends Component {
     this.getTransaction();
   };
 
-  getTransaction = async () => {
-    const ref = firebase.database().ref('/transaction');
-    ref.on('value', snapshot => {
-      let data = snapshot.val();
-      let transaction = Object.values(data);
-      let fix = transaction.map(item => item.data);
-      let transactionFix = Object.values(fix);
-      this.setState({
-        transaction: transactionFix[0],
+  //   getTransaction = async () => {
+  //     const ref = firebase.database().ref('/transaction');
+  //     ref.on('value', snapshot => {
+  //       let data = snapshot.val();
+  //       let transaction = Object.values(data);
+  //       let fix = transaction.map(item => item.data);
+  //       let transactionFix = Object.values(fix);
+  //       console.log('ss', transactionFix);
+
+  //       this.setState({
+  //         transaction: transactionFix[1],
+  //         ff: Object.values(transactionFix),
+  //       });
+  //     });
+  //   };
+
+  getTransaction = callback => {
+    let pathName = '/transaction/';
+    firebase
+      .database()
+      .ref(pathName)
+      .on('value', snapshot => {
+        let data = snapshot.val();
+        let arrayOfTransaction = [];
+        if (data) {
+          for (let key in data) {
+            let obj = data[key];
+            for (let prop in obj) {
+              let item = obj[prop];
+              for (let i in item) {
+                const {
+                  name,
+                  duration,
+                  _id,
+                  createdAt,
+                  price,
+                  driver,
+                  destination,
+                  date,
+                  pickupPoint,
+                  time,
+                } = item[i];
+                if (
+                  _id &&
+                  name &&
+                  duration &&
+                  createdAt &&
+                  price &&
+                  driver &&
+                  destination &&
+                  date &&
+                  pickupPoint &&
+                  time
+                ) {
+                  arrayOfTransaction.push({
+                    _id,
+                    name,
+                    duration,
+                    createdAt,
+                    price,
+                    driver,
+                    destination,
+                    date,
+                    pickupPoint,
+                    time,
+                  });
+                }
+              }
+            }
+          }
+        }
+        this.setState({
+          transaction: arrayOfTransaction,
+        });
       });
-    });
   };
 
   format = money => {
@@ -56,41 +121,51 @@ class Transaction extends Component {
 
   render() {
     const {transaction} = this.state;
+    console.log(transaction.map(i => i.name));
+
     return (
       <View style={styles.container}>
         <Text style={styles.titleContainer}>Transactions</Text>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.cardContainer}>
-            {transaction.map(item => (
-              <LinearGradient
-                colors={['#7be495', '#93f9b9']}
-                style={styles.card}
-                start={{x: 0, y: 0}}
-                end={{x: 1, y: 0}}
-                key={item._id}>
-                <TouchableOpacity
-                  style={styles.cardContent}
-                  onPress={() =>
-                    this.props.navigation.navigate('DetailTransaction', {item})
-                  }>
-                  <View style={styles.content}>
-                    <Text style={styles.titleContent}>{item.name}</Text>
-                    <Text style={styles.textOrderId}>#id-{item._id}</Text>
-                    <Text style={styles.textOrderId}>
-                      {new Date(item.createdAt).toString().slice(0, 25)}
-                    </Text>
-                    <Text style={styles.priceContent}>
-                      Rp.{this.format(item.price)}
-                    </Text>
-                  </View>
-                  <Image
-                    style={styles.imageCard}
-                    resizeMode="stretch"
-                    source={require('../../assets/subs.png')}
-                  />
-                </TouchableOpacity>
-              </LinearGradient>
-            ))}
+            {transaction.length < 1 ? (
+              <View>
+                <Text>dddd</Text>
+              </View>
+            ) : (
+              transaction.map(item => (
+                <LinearGradient
+                  colors={['#7be495', '#93f9b9']}
+                  style={styles.card}
+                  start={{x: 0, y: 0}}
+                  end={{x: 1, y: 0}}
+                  key={item._id}>
+                  <TouchableOpacity
+                    style={styles.cardContent}
+                    onPress={() =>
+                      this.props.navigation.navigate('DetailTransaction', {
+                        item,
+                      })
+                    }>
+                    <View style={styles.content}>
+                      <Text style={styles.titleContent}>{item.name}</Text>
+                      <Text style={styles.textOrderId}>#id-{item._id}</Text>
+                      <Text style={styles.textOrderId}>
+                        {new Date(item.createdAt).toString().slice(0, 25)}
+                      </Text>
+                      <Text style={styles.priceContent}>
+                        Rp.{this.format(item.price)}
+                      </Text>
+                    </View>
+                    <Image
+                      style={styles.imageCard}
+                      resizeMode="stretch"
+                      source={require('../../assets/subs.png')}
+                    />
+                  </TouchableOpacity>
+                </LinearGradient>
+              ))
+            )}
           </View>
         </ScrollView>
       </View>
